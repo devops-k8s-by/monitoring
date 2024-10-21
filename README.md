@@ -13,7 +13,7 @@
 
 Use ansible role prometheus to install.
 ```bash
-ansible-playbook playbook.yml -i inventory.ini --become --tags 
+ansible-playbook playbook.yml -i inventory.ini --become --tags prometheus
 ```
 
 ```bash
@@ -72,7 +72,7 @@ ubuntu                     : ok=12   changed=3    unreachable=0    failed=0    s
 
 Use ansible role node_exporter to install.
 ```bash
-ansible-playbook playbook.yml -i inventory.ini --become --tags 
+ansible-playbook playbook.yml -i inventory.ini --become --tags node_exporter
 ```
 
 ```bash
@@ -113,12 +113,6 @@ ok: [ubuntu]
 PLAY RECAP ******************************************************************************************************************************************************************************************************************************************
 ubuntu                     : ok=9    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
 ```
-
-
-
-
-
-
 
 
 
