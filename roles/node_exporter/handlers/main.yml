@@ -1,6 +1,5 @@
 ---
-- name: Reload Prometheus
+- name: Restart Prometheus
   systemd:
     name: prometheus
-    state: reloaded
-  delegate_to: "{{ prometheus_server }}"
+    state: restarted

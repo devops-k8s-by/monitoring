@@ -1,1 +1,2 @@
 roles/prometheus/files/prometheus.tar.gz filter=lfs diff=lfs merge=lfs -text
+roles/node_exporter/files/node_exporter.tar.gz filter=lfs diff=lfs merge=lfs -text

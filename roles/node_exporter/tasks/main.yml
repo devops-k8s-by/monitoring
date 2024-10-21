@@ -51,10 +51,10 @@
     state: started
 
 - name: Обновление конфигурации Prometheus с новым хостом
-  delegate_to: "{{ prometheus_server }}"
   lineinfile:
-    path: "/etc/prometheus/prometheus.yml"
+    path: "{{ prometheus_config_dir }}/prometheus.yml"
     insertafter: "^  - job_name: 'node_exporter'"
-    line: "      - targets: ['{{ ansible_host }}:{{ node_exporter_port }}']"
+    line: "      - targets: ['{{ ansible_default_ipv4.address }}:{{ node_exporter_port }}']"
   notify:
     - Reload Prometheus
+

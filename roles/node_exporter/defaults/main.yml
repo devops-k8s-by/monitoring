@@ -5,3 +5,4 @@ node_exporter_group: "node_exporter"
 node_exporter_install_dir: "/usr/local/bin"
 node_exporter_port: 9100
 prometheus_server: "localhost"
+prometheus_config_dir: "/etc/prometheus"
