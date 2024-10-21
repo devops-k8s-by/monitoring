@@ -1,6 +1,11 @@
-# Foobar
+## monitoring roles with ansible
 
-Foobar is a Python library for dealing with word pluralization.
+4 ansible roles 
+- elastik_kibana
+- fluentbit
+- node_exporter
+- prometheus
+
 
 ## Installation roles one by one
 
