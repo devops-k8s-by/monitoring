@@ -1,0 +1,5 @@
+---
+elasticsearch_version: "7.x"
+kibana_version: "7.x"
+elasticsearch_user: "elasticsearch"
+kibana_user: "kibana"

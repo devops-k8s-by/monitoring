@@ -1,0 +1,58 @@
+---
+- name: Добавление репозитория Fluent Bit
+  apt_repository:
+    repo: "deb https://packages.fluentbit.io/ubuntu/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
+    state: present
+  become: yes
+
+- name: Добавление GPG ключа Fluent Bit
+  apt_key:
+    url: https://packages.fluentbit.io/fluentbit.key
+    state: present
+  become: yes
+
+- name: Обновление кеша пакетов
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Установка Fluent Bit
+  apt:
+    name: td-agent-bit
+    state: present
+  become: yes
+
+- name: Создание пользователя Fluent Bit
+  user:
+    name: "{{ fluentbit_user }}"
+    shell: /sbin/nologin
+    system: yes
+    create_home: no
+  become: yes
+
+- name: Копирование файла конфигурации Fluent Bit
+  template:
+    src: fluent-bit.conf.j2
+    dest: "/etc/td-agent-bit/td-agent-bit.conf"
+    owner: "{{ fluentbit_user }}"
+    group: "{{ fluentbit_group }}"
+    mode: '0644'
+  become: yes
+
+- name: Копирование systemd сервиса Fluent Bit
+  template:
+    src: fluent-bit.service.j2
+    dest: "/etc/systemd/system/td-agent-bit.service"
+    mode: '0644'
+  become: yes
+
+- name: Перезагрузка демона systemd
+  command: systemctl daemon-reload
+  become: yes
+
+- name: Включение и запуск Fluent Bit
+  systemd:
+    name: td-agent-bit
+    enabled: yes
+    state: started
+  become: yes

@@ -1,0 +1,79 @@
+---
+- name: Установка зависимостей
+  apt:
+    name: apt-transport-https
+    state: present
+  become: yes
+
+- name: Добавление GPG ключа Elastic
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+  become: yes
+
+- name: Добавление репозитория Elastic
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/{{ elasticsearch_version }}/apt stable main"
+    state: present
+  become: yes
+
+- name: Обновление кеша пакетов
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Установка Elasticsearch
+  apt:
+    name: elasticsearch
+    state: present
+  become: yes
+
+- name: Установка Kibana
+  apt:
+    name: kibana
+    state: present
+  become: yes
+
+- name: Копирование systemd сервиса Elasticsearch
+  template:
+    src: elasticsearch.service.j2
+    dest: "/etc/systemd/system/elasticsearch.service"
+    mode: '0644'
+  become: yes
+
+- name: Копирование systemd сервиса Kibana
+  template:
+    src: kibana.service.j2
+    dest: "/etc/systemd/system/kibana.service"
+    mode: '0644'
+  become: yes
+
+- name: Создание пользователей и директорий с нужными правами
+  file:
+    path: "/var/lib/{{ item }}"
+    state: directory
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: '0755'
+  loop:
+    - "{{ elasticsearch_user }}"
+    - "{{ kibana_user }}"
+  become: yes
+
+- name: Перезагрузка демона systemd
+  command: systemctl daemon-reload
+  become: yes
+
+- name: Включение и запуск Elasticsearch
+  systemd:
+    name: elasticsearch
+    enabled: yes
+    state: started
+  become: yes
+
+- name: Включение и запуск Kibana
+  systemd:
+    name: kibana
+    enabled: yes
+    state: started
+  become: yes

@@ -1,0 +1,12 @@
+[Unit]
+Description=Fluent Bit
+After=network.target
+
+[Service]
+Type=simple
+User={{ fluentbit_user }}
+Group={{ fluentbit_group }}
+ExecStart=/opt/td-agent-bit/bin/td-agent-bit -c /etc/td-agent-bit/td-agent-bit.conf
+
+[Install]
+WantedBy=multi-user.target

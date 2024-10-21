@@ -1,0 +1,88 @@
+---
+- name: Создание пользователя и группы для Prometheus
+  user:
+    name: "{{ prometheus_user }}"
+    shell: /sbin/nologin
+    system: yes
+    create_home: no
+
+- name: Создание необходимых директорий
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: '0755'
+  loop:
+    - "{{ prometheus_config_dir }}"
+    - "{{ prometheus_data_dir }}"
+
+- name: Проверка наличия файла Prometheus на удаленной машине
+  stat:
+    path: "/tmp/prometheus.tar.gz"
+  register: prometheus_file_check
+
+- name: Копирование локального архива Prometheus
+  copy:
+    src: "prometheus.tar.gz"
+    dest: "/tmp/prometheus.tar.gz"
+    mode: '0644'
+  when: not prometheus_file_check.stat.exists
+  tags:
+    - copy_prometheus
+
+- name: Распаковка архива Prometheus
+  unarchive:
+    src: "/tmp/prometheus.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: Копирование бинарных файлов Prometheus
+  copy:
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+    dest: "{{ prometheus_install_dir }}/{{ item }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: '0755'
+    remote_src: yes
+  loop:
+    - prometheus
+    - promtool
+
+
+- name: Копирование консолей и библиотек
+  copy:
+    src: "/tmp/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}"
+    dest: "{{ prometheus_config_dir }}/{{ item }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: '0755'
+    remote_src: yes
+  loop:
+    - consoles
+    - console_libraries
+
+- name: Копирование файла конфигурации Prometheus
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ prometheus_config_dir }}/prometheus.yml"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: '0644' 
+  notify:
+    - Restart Prometheus
+
+- name: Копирование systemd сервиса Prometheus
+  template:
+    src: prometheus.service.j2
+    dest: "/etc/systemd/system/prometheus.service"
+    mode: '0644'  
+
+- name: Перезагрузка демона systemd
+  command: systemctl daemon-reload
+
+- name: Включение и запуск сервиса Prometheus
+  systemd:
+    name: prometheus
+    enabled: yes
+    state: started

@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: yes
+  roles:
+    - { role: prometheus, tags: prometheus }
+    - { role: node_exporter, tags: node_exporter }
+    - { role: elasticsearch_kibana, tags: elasticsearch_kibana }
+    - { role: fluentbit, tags: fluentbit }
