@@ -56,5 +56,5 @@
     insertafter: "^  - job_name: 'node_exporter'"
     line: "      - targets: ['{{ ansible_default_ipv4.address }}:{{ node_exporter_port }}']"
   notify:
-    - Reload Prometheus
+    - Restart Prometheus
 
